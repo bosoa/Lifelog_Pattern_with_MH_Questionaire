@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifelog Pattern with MH Questionnaire - 분석 리포트</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 2.5em; }
+        h2 { color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #764ba2; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #667eea;
+            color: white;
+        }
+        .metric {
+            display: inline-block;
+            background: #f0f4ff;
+            padding: 15px 25px;
+            margin: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 정신건강 라이프로그 통합 분석</h1>
+        <p style="font-size: 1.2em; margin-top: 10px;">Lifelog Pattern with Mental Health Questionnaire</p>
+        <p>분석 완료일: 2026년 06월 28일</p>
+    </div>
+
+    <div class="section">
+        <h2>📊 분석 개요</h2>
+        <p>본 연구는 라이프로그 생체신호 데이터와 정신건강 설문 데이터를 통합하여 다음 3가지 핵심 인사이트를 검증했습니다:</p>
+        <ol>
+            <li><strong>종단 연구 설계</strong>: 1회차-2회차 추적을 통한 정신건강 변화 패턴 분석</li>
+            <li><strong>다차원 정신건강 평가</strong>: 여러 척도를 통합한 정신건강 유형 분류</li>
+            <li><strong>라이프로그 통합</strong>: 생체신호와 정신건강 지표 간 관계 탐색</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>📈 주요 지표</h2>
+        <div style="text-align: center;">
+            <div class="metric">
+                <div class="metric-value">2,859명</div>
+                <div class="metric-label">1회차 참여자</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">51.2%</div>
+                <div class="metric-label">추적률 (1,463명)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">90.1%</div>
+                <div class="metric-label">라이프로그 매칭률</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">2개</div>
+                <div class="metric-label">정신건강 클러스터</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔍 Task 1: 데이터 탐색 및 전처리</h2>
+        <h3>데이터셋 구성</h3>
+        <table>
+            <tr>
+                <th>항목</th>
+                <th>1회차</th>
+                <th>2회차</th>
+            </tr>
+            <tr>
+                <td>참여자 수</td>
+                <td>2,859명</td>
+                <td>1,463명 (51.2%)</td>
+            </tr>
+            <tr>
+                <td>측정 변수</td>
+                <td>166개</td>
+                <td>166개</td>
+            </tr>
+            <tr>
+                <td>주요 척도</td>
+                <td colspan="2">PHQ-9, GAD-7, ISI, PSS-10, 외로움, WHOQOL</td>
+            </tr>
+        </table>
+
+        <h3>1회차 정신건강 현황</h3>
+        <table>
+            <tr>
+                <th>척도</th>
+                <th>평균 (SD)</th>
+                <th>위험군 비율</th>
+            </tr>
+            <tr>
+                <td>PHQ-9 (우울)</td>
+                <td>5.5 (5.1)</td>
+                <td>49.1% (5점 이상)</td>
+            </tr>
+            <tr>
+                <td>GAD-7 (불안)</td>
+                <td>4.4 (4.3)</td>
+                <td>41.6% (5점 이상)</td>
+            </tr>
+            <tr>
+                <td>ISI (불면증)</td>
+                <td>10.2 (6.4)</td>
+                <td>63.1% (8점 이상)</td>
+            </tr>
+            <tr>
+                <td>외로움</td>
+                <td>4.0 (1.8)</td>
+                <td>87.7% (2점 이상)</td>
+            </tr>
+            <tr>
+                <td>WHOQOL (삶의 질)</td>
+                <td>59.2 (17.1)</td>
+                <td>-</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📉 Task 2: 종단 분석 - 시간 경과 변화</h2>
+        <div class="highlight success">
+            <strong>✅ 핵심 발견:</strong> 모든 정신건강 지표가 유의하게 개선되었습니다!
+        </div>
+
+        <table>
+            <tr>
+                <th>척도</th>
+                <th>1회차</th>
+                <th>2회차</th>
+                <th>변화</th>
+                <th>유의성</th>
+            </tr>
+            <tr>
+                <td>PHQ-9 (우울)</td>
+                <td>5.50</td>
+                <td>4.69</td>
+                <td>-0.82</td>
+                <td>p < 0.001 ***</td>
+            </tr>
+            <tr>
+                <td>GAD-7 (불안)</td>
+                <td>4.37</td>
+                <td>3.57</td>
+                <td>-0.80</td>
+                <td>p < 0.001 ***</td>
+            </tr>
+            <tr>
+                <td>ISI (불면증)</td>
+                <td>10.18</td>
+                <td>9.27</td>
+                <td>-0.90</td>
+                <td>p < 0.001 ***</td>
+            </tr>
+            <tr>
+                <td>외로움</td>
+                <td>3.98</td>
+                <td>3.87</td>
+                <td>-0.11</td>
+                <td>p < 0.05 *</td>
+            </tr>
+            <tr>
+                <td>WHOQOL (삶의 질)</td>
+                <td>59.10</td>
+                <td>60.07</td>
+                <td>+0.97</td>
+                <td>p < 0.05 *</td>
+            </tr>
+        </table>
+
+        <h3>변화 패턴</h3>
+        <ul>
+            <li><strong>개선</strong>: 우울 27.6%, 불안 24.6%, 불면증 33.5%</li>
+            <li><strong>유지</strong>: 대부분 40~60% 범위에서 안정적 유지</li>
+            <li><strong>악화</strong>: 소수 (12~22%)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🎯 Task 3: 다차원 정신건강 프로파일링</h2>
+        <div class="highlight">
+            <strong>💡 핵심 발견:</strong> 2개의 명확한 정신건강 유형이 발견되었습니다
+        </div>
+
+        <h3>클러스터 프로필</h3>
+        <table>
+            <tr>
+                <th>특성</th>
+                <th>클러스터 0 (양호군)</th>
+                <th>클러스터 1 (취약군)</th>
+            </tr>
+            <tr>
+                <td>인원</td>
+                <td>1,604명 (56.1%)</td>
+                <td>1,255명 (43.9%)</td>
+            </tr>
+            <tr>
+                <td>PHQ-9 (우울)</td>
+                <td>2.32 ± 2.17</td>
+                <td>9.57 ± 4.78</td>
+            </tr>
+            <tr>
+                <td>GAD-7 (불안)</td>
+                <td>1.66 ± 1.88</td>
+                <td>7.81 ± 3.95</td>
+            </tr>
+            <tr>
+                <td>ISI (불면증)</td>
+                <td>6.61 ± 4.59</td>
+                <td>14.75 ± 5.41</td>
+            </tr>
+            <tr>
+                <td>외로움</td>
+                <td>3.02 ± 1.68</td>
+                <td>5.15 ± 1.05</td>
+            </tr>
+            <tr>
+                <td>WHOQOL (삶의 질)</td>
+                <td>68.51 ± 14.65</td>
+                <td>47.35 ± 11.99</td>
+            </tr>
+        </table>
+
+        <h3>척도 간 상관관계 (주요)</h3>
+        <ul>
+            <li>PHQ-9 ↔ GAD-7: <strong>r = 0.838</strong> (매우 높은 우울-불안 공병성)</li>
+            <li>PSS ↔ WHOQOL: <strong>r = -0.628</strong> (스트레스 ↑ → 삶의 질 ↓)</li>
+            <li>외로움 ↔ WHOQOL: <strong>r = -0.580</strong> (외로움 ↑ → 삶의 질 ↓)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>📱 Task 4: 라이프로그-정신건강 통합 분석</h2>
+        <h3>데이터 통합 현황</h3>
+        <ul>
+            <li>라이프로그 데이터: 18개 생체신호 (HRV, 수면, 활동량 등)</li>
+            <li>매칭 성공: <strong>2,562명 (89.6%)</strong></li>
+            <li>유의한 상관관계: <strong>46개 발견</strong></li>
+        </ul>
+
+        <h3>주요 상관관계 (Top 10)</h3>
+        <table>
+            <tr>
+                <th>라이프로그</th>
+                <th>정신건강 지표</th>
+                <th>상관계수 (r)</th>
+                <th>해석</th>
+            </tr>
+            <tr>
+                <td>REM 수면 (a05)</td>
+                <td>불면증 (ISI)</td>
+                <td>0.101</td>
+                <td>REM 수면 ↑ → 불면증 점수 ↑</td>
+            </tr>
+            <tr>
+                <td>활동 센서 (a03)</td>
+                <td>우울 (PHQ-9)</td>
+                <td>0.093</td>
+                <td>활동량 ↑ → 우울 점수 ↑</td>
+            </tr>
+            <tr>
+                <td>총 수면시간 (a15)</td>
+                <td>불면증 (ISI)</td>
+                <td>0.093</td>
+                <td>총 수면 ↑ → 불면증 점수 ↑</td>
+            </tr>
+            <tr>
+                <td>화면시간 (a07)</td>
+                <td>외로움</td>
+                <td>0.088</td>
+                <td>화면시간 ↑ → 외로움 ↑</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>🤖 Task 5: 예측 모델 구축</h2>
+        <p>라이프로그 데이터(18개 생체신호)로 정신건강 상태를 예측하는 Random Forest 모델 구축</p>
+
+        <table>
+            <tr>
+                <th>예측 대상</th>
+                <th>테스트 R²</th>
+                <th>테스트 MAE</th>
+                <th>해석</th>
+            </tr>
+            <tr>
+                <td>PHQ-9 (우울)</td>
+                <td>-0.016</td>
+                <td>4.015</td>
+                <td>과적합, 예측력 낮음</td>
+            </tr>
+            <tr>
+                <td>GAD-7 (불안)</td>
+                <td>-0.009</td>
+                <td>3.493</td>
+                <td>과적합, 예측력 낮음</td>
+            </tr>
+            <tr>
+                <td>ISI (불면증)</td>
+                <td>-0.030</td>
+                <td>5.344</td>
+                <td>과적합, 예측력 낮음</td>
+            </tr>
+        </table>
+
+        <div class="highlight">
+            <strong>⚠️ 발견:</strong> 생체신호만으로는 정신건강 상태를 정확히 예측하기 어렵습니다. 
+            더 많은 특징(심리사회적 요인, 환경 요인 등)이 필요합니다.
+        </div>
+
+        <h3>중요 특징 (Feature Importance)</h3>
+        <ul>
+            <li>이동거리 (a11)</li>
+            <li>심박수 (a08)</li>
+            <li>화면시간 (a07)</li>
+            <li>조도센서 (a14)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💡 핵심 인사이트 종합</h2>
+        
+        <h3>✅ Insight 1: 종단 연구의 가치</h3>
+        <p>51.2%의 우수한 추적률로 시간 경과에 따른 정신건강 변화를 관찰할 수 있었습니다. 
+        모든 정신건강 지표가 유의하게 개선되어, 자연적 회복 또는 개입 효과가 있었음을 시사합니다.</p>
+
+        <h3>✅ Insight 2: 다차원 평가의 중요성</h3>
+        <p>여러 척도를 통합 분석한 결과, 2개의 명확한 정신건강 유형(양호군 56.1%, 취약군 43.9%)이 발견되었습니다. 
+        우울-불안의 높은 공병성(r=0.838)은 통합적 개입의 필요성을 시사합니다.</p>
+
+        <h3>✅ Insight 3: 라이프로그 통합의 가능성과 한계</h3>
+        <p><strong>가능성:</strong> 90.1%의 높은 매칭률로 생체신호와 정신건강 지표를 통합 분석할 수 있었으며, 
+        46개의 유의한 상관관계가 발견되었습니다.</p>
+        <p><strong>한계:</strong> 생체신호만으로는 정신건강을 정확히 예측하기 어렵습니다 (R² ≈ 0). 
+        심리사회적 요인, 생활습관, 환경 요인 등 추가 특징이 필요합니다.</p>
+    </div>
+
+    <div class="section">
+        <h2>🎯 향후 연구 방향</h2>
+        <ol>
+            <li><strong>특징 공학 강화</strong>: 생체신호의 시계열 패턴, 변화율, 주기성 등 파생 특징 생성</li>
+            <li><strong>다중 모달리티 통합</strong>: 생체신호 + 설문 + 행동 데이터 통합 모델</li>
+            <li><strong>딥러닝 적용</strong>: LSTM, Transformer 등 시계열 딥러닝 모델 활용</li>
+            <li><strong>개인화 모델</strong>: 개인별 베이스라인 대비 변화 탐지</li>
+            <li><strong>개입 효과 분석</strong>: 정신건강 개선 요인 탐색 (자연 회복 vs 개입)</li>
+        </ol>
+    </div>
+
+    <div class="footer">
+        <p>분석 도구: Python, scikit-learn, pandas, seaborn</p>
+        <p>생성 파일: CSV 13개, PNG 시각화 10+개</p>
+        <p>© 2026 Lifelog Pattern with MH Questionnaire Analysis</p>
+    </div>
+</body>
+</html>

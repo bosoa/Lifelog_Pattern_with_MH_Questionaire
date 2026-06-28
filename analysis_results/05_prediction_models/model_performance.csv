@@ -1,0 +1,4 @@
+Target,N_train,N_test,Train_R2,Test_R2,Test_MAE,Test_RMSE
+PHQ9_Score,2049,513,0.516,-0.016,4.015,5.304
+GAD7_Score,2049,513,0.507,-0.009,3.493,4.437
+ISI_Score,2049,513,0.481,-0.030,5.344,6.597
