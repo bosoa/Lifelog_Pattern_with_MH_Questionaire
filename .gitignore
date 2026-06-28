@@ -49,3 +49,18 @@ logs/
 
 # Streamlit cache
 .streamlit/
+
+# 이전 프로젝트 (좌표 변환) 관련 파일 제외
+data_splits*/
+hierarchical_data*/
+model_results*/
+phenotype_analysis_results/
+feature_grouping_analysis/
+visualization_results/
+reports_for_paper/
+*.md
+!analysis_results/**/*.md
+check_infinity.py
+fix_infinity_values.py
+run_model_comparison*.py
+run_pca_app.sh
