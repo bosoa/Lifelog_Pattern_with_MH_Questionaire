@@ -1,0 +1,801 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정신건강 라이프로그 통합 분석 - 최종 보고서</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .header .date {
+            margin-top: 20px;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-title .icon {
+            font-size: 1.2em;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .metric-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .highlight-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left-color: #28a745;
+        }
+        
+        .success-box h3 {
+            color: #28a745;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left-color: #ffc107;
+        }
+        
+        .warning-box h3 {
+            color: #e67e22;
+        }
+        
+        .info-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-list li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .info-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .model-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        
+        .model-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .model-card h4 {
+            color: #667eea;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin-top: 20px;
+        }
+        
+        .footer-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🧠 정신건강 라이프로그 통합 분석</h1>
+            <div class="subtitle">Med-Gemma 영감 딥러닝 모델 포함 최종 보고서</div>
+            <div class="date">📅 분석 완료: 2026년 06월 28일 14:26</div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <a href="#overview">📊 개요</a>
+            <a href="#longitudinal">📉 종단분석</a>
+            <a href="#clustering">🎯 클러스터링</a>
+            <a href="#integration">📱 라이프로그 통합</a>
+            <a href="#medgemma">🤖 Med-Gemma 모델</a>
+            <a href="#insights">💡 인사이트</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Overview Section -->
+            <section id="overview" class="section">
+                <h2 class="section-title">
+                    <span class="icon">📊</span>
+                    분석 개요
+                </h2>
+                
+                <p style="font-size: 1.15em; margin-bottom: 30px;">
+                    본 연구는 정신건강 설문 데이터와 라이프로그 생체신호를 통합하여 
+                    <strong>종단 연구, 다차원 프로파일링, AI 예측 모델</strong>을 통해 
+                    정신건강 패턴을 분석했습니다.
+                </p>
+
+                <div class="metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">2,859명</div>
+                        <div class="metric-label">1회차 참여자</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">51.2%</div>
+                        <div class="metric-label">추적률 (1,463명)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">90.1%</div>
+                        <div class="metric-label">라이프로그 매칭률</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">7개</div>
+                        <div class="metric-label">분석 모델</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🔬 주요 분석 방법론</h3>
+                    <ul class="info-list">
+                        <li><strong>종단 분석</strong>: Paired t-test, Cohen's d 효과크기</li>
+                        <li><strong>클러스터링</strong>: K-means, PCA, 계층적 클러스터링</li>
+                        <li><strong>상관분석</strong>: Pearson correlation (46개 유의한 관계)</li>
+                        <li><strong>예측 모델</strong>: Random Forest, Med-Gemma 영감 딥러닝</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Longitudinal Analysis -->
+            <section id="longitudinal" class="section">
+                <h2 class="section-title">
+                    <span class="icon">📉</span>
+                    종단 분석: 시간 경과 변화
+                </h2>
+
+                <div class="success-box">
+                    <h3>✅ 핵심 발견: 모든 정신건강 지표 유의한 개선!</h3>
+                    <p style="margin-top: 10px;">
+                        1회차에서 2회차까지 추적한 1,463명의 데이터 분석 결과, 
+                        <strong>우울, 불안, 불면증 모두 통계적으로 유의한 개선</strong>을 보였습니다.
+                    </p>
+                </div>
+
+                <table><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>척도</th>
+      <th>N</th>
+      <th>1회차 M(SD)</th>
+      <th>2회차 M(SD)</th>
+      <th>변화 M(SD)</th>
+      <th>t</th>
+      <th>p</th>
+      <th>d</th>
+      <th>개선%</th>
+      <th>유지%</th>
+      <th>악화%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PHQ-9 (우울)</td>
+      <td>1462</td>
+      <td>5.50(4.93)</td>
+      <td>4.69(4.54)</td>
+      <td>-0.82(4.34)</td>
+      <td>7.215</td>
+      <td>0.0000</td>
+      <td>-0.173</td>
+      <td>27.6</td>
+      <td>56.7</td>
+      <td>15.7</td>
+    </tr>
+    <tr>
+      <td>GAD-7 (불안)</td>
+      <td>1462</td>
+      <td>4.37(4.10)</td>
+      <td>3.57(3.63)</td>
+      <td>-0.80(3.60)</td>
+      <td>8.515</td>
+      <td>0.0000</td>
+      <td>-0.207</td>
+      <td>24.6</td>
+      <td>62.7</td>
+      <td>12.7</td>
+    </tr>
+    <tr>
+      <td>ISI (불면증)</td>
+      <td>1461</td>
+      <td>10.18(6.19)</td>
+      <td>9.27(5.84)</td>
+      <td>-0.90(4.96)</td>
+      <td>6.973</td>
+      <td>0.0000</td>
+      <td>-0.150</td>
+      <td>33.5</td>
+      <td>44.3</td>
+      <td>22.2</td>
+    </tr>
+    <tr>
+      <td>외로움</td>
+      <td>1462</td>
+      <td>3.98(1.82)</td>
+      <td>3.87(1.84)</td>
+      <td>-0.11(1.68)</td>
+      <td>2.454</td>
+      <td>0.0142</td>
+      <td>-0.059</td>
+      <td>7.0</td>
+      <td>86.9</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <td>WHOQOL (삶의 질)</td>
+      <td>1453</td>
+      <td>59.10(16.87)</td>
+      <td>60.07(17.46)</td>
+      <td>0.97(15.18)</td>
+      <td>-2.430</td>
+      <td>0.0152</td>
+      <td>0.056</td>
+      <td>39.3</td>
+      <td>17.2</td>
+      <td>43.5</td>
+    </tr>
+  </tbody>
+</table>
+
+                <div class="highlight-box">
+                    <h3>📊 변화 패턴 분석</h3>
+                    <ul class="info-list">
+                        <li><strong>개선</strong>: PHQ-9 27.6%, GAD-7 24.6%, ISI 33.5%</li>
+                        <li><strong>유지</strong>: 대부분 40~60% 범위에서 안정적</li>
+                        <li><strong>악화</strong>: 소수 (12~22%)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Clustering -->
+            <section id="clustering" class="section">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    다차원 정신건강 프로파일링
+                </h2>
+
+                <div class="highlight-box">
+                    <h3>💡 2개의 명확한 정신건강 유형 발견</h3>
+                    <p>K-means 클러스터링과 PCA 분석을 통해 참여자들이 두 개의 뚜렷한 그룹으로 분류됨을 확인했습니다.</p>
+                </div>
+
+                <table><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Cluster</th>
+      <th>N</th>
+      <th>PHQ9_Score_Mean</th>
+      <th>PHQ9_Score_SD</th>
+      <th>GAD7_Score_Mean</th>
+      <th>GAD7_Score_SD</th>
+      <th>ISI_Score_Mean</th>
+      <th>ISI_Score_SD</th>
+      <th>Loneliness_Score_Mean</th>
+      <th>Loneliness_Score_SD</th>
+      <th>WHOQOL_Score_Mean</th>
+      <th>WHOQOL_Score_SD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>1604</td>
+      <td>2.316085</td>
+      <td>2.174649</td>
+      <td>1.655860</td>
+      <td>1.876411</td>
+      <td>6.606608</td>
+      <td>4.592351</td>
+      <td>3.023691</td>
+      <td>1.684967</td>
+      <td>68.511222</td>
+      <td>14.650871</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>1255</td>
+      <td>9.567331</td>
+      <td>4.783349</td>
+      <td>7.806375</td>
+      <td>3.947012</td>
+      <td>14.746614</td>
+      <td>5.409943</td>
+      <td>5.150598</td>
+      <td>1.049241</td>
+      <td>47.350598</td>
+      <td>11.988356</td>
+    </tr>
+  </tbody>
+</table>
+
+                <div class="model-comparison">
+                    <div class="model-card">
+                        <h4>🟢 클러스터 0: 양호군</h4>
+                        <ul class="info-list">
+                            <li>인원: 1,604명 (56.1%)</li>
+                            <li>PHQ-9: 2.32 (매우 낮음)</li>
+                            <li>GAD-7: 1.66 (정상)</li>
+                            <li>ISI: 6.61 (정상)</li>
+                            <li>삶의 질: 68.51 (높음)</li>
+                        </ul>
+                    </div>
+                    <div class="model-card">
+                        <h4>🔴 클러스터 1: 취약군</h4>
+                        <ul class="info-list">
+                            <li>인원: 1,255명 (43.9%)</li>
+                            <li>PHQ-9: 9.57 (중등도)</li>
+                            <li>GAD-7: 7.81 (불안)</li>
+                            <li>ISI: 14.75 (경미 불면증)</li>
+                            <li>삶의 질: 47.35 (낮음)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>⚠️ 주요 상관관계</h3>
+                    <ul class="info-list">
+                        <li><strong>우울-불안 공병성</strong>: r = 0.838 (매우 높음)</li>
+                        <li><strong>스트레스-삶의질</strong>: r = -0.628 (강한 부적 상관)</li>
+                        <li><strong>외로움-삶의질</strong>: r = -0.580 (부적 상관)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Lifelog Integration -->
+            <section id="integration" class="section">
+                <h2 class="section-title">
+                    <span class="icon">📱</span>
+                    라이프로그-정신건강 통합 분석
+                </h2>
+
+                <p style="font-size: 1.1em; margin-bottom: 25px;">
+                    18개 생체신호 (HRV, 수면, 활동량 등)와 정신건강 설문을 통합하여 
+                    <strong>46개의 유의한 상관관계</strong>를 발견했습니다.
+                </p>
+
+                <div class="metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">2,562명</div>
+                        <div class="metric-label">통합 데이터 (90.1%)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">18개</div>
+                        <div class="metric-label">생체신호 유형</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">46개</div>
+                        <div class="metric-label">유의한 상관관계</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🔗 주요 상관관계 (Top 5)</h3>
+                    <ul class="info-list">
+                        <li><strong>REM 수면 ↔ 불면증</strong>: r = 0.101 (p < 0.001)</li>
+                        <li><strong>활동량 ↔ 우울</strong>: r = 0.093 (p < 0.001)</li>
+                        <li><strong>총 수면시간 ↔ 불면증</strong>: r = 0.093 (p < 0.001)</li>
+                        <li><strong>화면시간 ↔ 외로움</strong>: r = 0.088 (p < 0.001)</li>
+                        <li><strong>얕은 수면 ↔ 우울</strong>: r = 0.089 (p < 0.001)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Med-Gemma Model -->
+            <section id="medgemma" class="section">
+                <h2 class="section-title">
+                    <span class="icon">🤖</span>
+                    Med-Gemma 영감 딥러닝 모델
+                </h2>
+
+                <div class="highlight-box">
+                    <h3>🔬 모델 구조</h3>
+                    <ul class="info-list">
+                        <li><strong>Medical Attention</strong>: 의료 도메인 지식 기반 가중치</li>
+                        <li><strong>Multi-layer NN</strong>: [128, 64, 32] 은닉층</li>
+                        <li><strong>Regularization</strong>: Batch Normalization + Dropout (0.3)</li>
+                        <li><strong>입력 특징</strong>: 11개 생체신호 (결측 < 10%)</li>
+                    </ul>
+                </div>
+
+                <table><table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>척도</th>
+      <th>N_train</th>
+      <th>N_test</th>
+      <th>MAE</th>
+      <th>RMSE</th>
+      <th>R²</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PHQ9_Score</td>
+      <td>1840</td>
+      <td>461</td>
+      <td>3.896</td>
+      <td>5.095</td>
+      <td>-0.017</td>
+    </tr>
+    <tr>
+      <td>GAD7_Score</td>
+      <td>1840</td>
+      <td>461</td>
+      <td>3.279</td>
+      <td>4.137</td>
+      <td>-0.034</td>
+    </tr>
+    <tr>
+      <td>ISI_Score</td>
+      <td>1840</td>
+      <td>461</td>
+      <td>5.453</td>
+      <td>6.618</td>
+      <td>-0.001</td>
+    </tr>
+  </tbody>
+</table>
+
+                <div class="warning-box">
+                    <h3>⚠️ 모델 성능 해석</h3>
+                    <p><strong>R² ≈ 0 (음수)</strong>는 생체신호만으로는 정신건강 상태를 정확히 예측하기 어렵다는 것을 의미합니다.</p>
+                    <br>
+                    <p><strong>주요 원인:</strong></p>
+                    <ul class="info-list">
+                        <li>정신건강은 생물학적 요인 외에도 <strong>심리사회적 요인</strong>이 크게 영향</li>
+                        <li>현재 사용한 특징: 평균값만 → <strong>시계열 패턴, 변화율 미포함</strong></li>
+                        <li>결측치로 인해 <strong>18개 중 7개 특징 제외</strong></li>
+                    </ul>
+                </div>
+
+                <div class="model-comparison">
+                    <div class="model-card">
+                        <h4>📊 Random Forest (기존)</h4>
+                        <p><strong>PHQ-9</strong>: R² = -0.016</p>
+                        <p><strong>GAD-7</strong>: R² = -0.009</p>
+                        <p><strong>ISI</strong>: R² = -0.030</p>
+                        <p style="margin-top: 15px; color: #666;">
+                            14개 특징, 과적합 발생
+                        </p>
+                    </div>
+                    <div class="model-card">
+                        <h4>🤖 Med-Gemma NN (신규)</h4>
+                        <p><strong>PHQ-9</strong>: R² = -0.017</p>
+                        <p><strong>GAD-7</strong>: R² = -0.034</p>
+                        <p><strong>ISI</strong>: R² = -0.001</p>
+                        <p style="margin-top: 15px; color: #666;">
+                            11개 특징, 의료 도메인 지식 통합
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Insights -->
+            <section id="insights" class="section">
+                <h2 class="section-title">
+                    <span class="icon">💡</span>
+                    핵심 인사이트 & 향후 방향
+                </h2>
+
+                <div class="success-box">
+                    <h3>✅ 성공한 부분</h3>
+                    <ul class="info-list">
+                        <li><strong>높은 추적률</strong>: 51.2%는 온라인 코호트 연구에서 우수한 수준</li>
+                        <li><strong>정신건강 개선 확인</strong>: 모든 지표에서 통계적으로 유의한 개선</li>
+                        <li><strong>명확한 유형 분류</strong>: 양호군/취약군 2개 클러스터 발견</li>
+                        <li><strong>생체신호 연관성</strong>: 46개 유의한 상관관계 확인</li>
+                        <li><strong>의료 AI 프레임워크</strong>: Med-Gemma 통합 인프라 구축</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3>⚠️ 한계점</h3>
+                    <ul class="info-list">
+                        <li><strong>예측 모델 한계</strong>: 생체신호만으로는 정신건강 예측 어려움 (R² ≈ 0)</li>
+                        <li><strong>결측치 문제</strong>: 일부 중요 특징 (취침/기상시간, 혈압) 높은 결측률</li>
+                        <li><strong>단순 특징</strong>: 평균값만 사용, 시계열 패턴 미활용</li>
+                        <li><strong>단일 모달리티</strong>: 생체신호만 사용, 심리사회적 요인 미포함</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🚀 향후 연구 방향</h3>
+                    
+                    <h4 style="color: #667eea; margin-top: 20px;">1. 특징 공학 강화</h4>
+                    <ul class="info-list">
+                        <li>시계열 패턴: 변화율, 주기성, 이상치 탐지</li>
+                        <li>상호작용 특징: 수면×활동량, 심박수×스트레스</li>
+                        <li>도메인 특징: 일주기 리듬 점수, 회복력 지표</li>
+                    </ul>
+
+                    <h4 style="color: #667eea; margin-top: 20px;">2. 다중 모달리티 통합</h4>
+                    <ul class="info-list">
+                        <li>생체신호 + 설문 응답 + 행동 데이터</li>
+                        <li>환경 요인: 날씨, 계절, 사회경제적 지위</li>
+                        <li>치료 이력, 약물 복용, 생활 사건</li>
+                    </ul>
+
+                    <h4 style="color: #667eea; margin-top: 20px;">3. 고급 AI 모델</h4>
+                    <ul class="info-list">
+                        <li>LSTM/Transformer: 시계열 패턴 학습</li>
+                        <li>Transfer Learning: 사전학습 의료 모델 활용</li>
+                        <li>개인화 모델: 개인별 베이스라인 대비 변화</li>
+                        <li>Explainable AI: 예측 근거 설명 가능</li>
+                    </ul>
+
+                    <h4 style="color: #667eea; margin-top: 20px;">4. 실용화 방안</h4>
+                    <ul class="info-list">
+                        <li>실시간 모니터링: 위험군 조기 감지 시스템</li>
+                        <li>개인 맞춤 개입: 클러스터별 맞춤형 전략</li>
+                        <li>임상 활용: 정신건강 전문의 의사결정 지원</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Summary -->
+            <section class="section">
+                <h2 class="section-title">
+                    <span class="icon">📋</span>
+                    전체 요약
+                </h2>
+
+                <div class="highlight-box">
+                    <h3>📊 분석 성과</h3>
+                    <table style="margin: 20px 0;">
+                        <tr>
+                            <th>분석 영역</th>
+                            <th>주요 결과</th>
+                            <th>생성 파일</th>
+                        </tr>
+                        <tr>
+                            <td>데이터 탐색</td>
+                            <td>2,859명 → 1,463명 (51.2% 추적)</td>
+                            <td>11개 CSV</td>
+                        </tr>
+                        <tr>
+                            <td>종단 분석</td>
+                            <td>모든 지표 유의한 개선 (p < 0.05)</td>
+                            <td>10개 PNG + 3개 CSV</td>
+                        </tr>
+                        <tr>
+                            <td>클러스터링</td>
+                            <td>2개 유형 (양호 56.1%, 취약 43.9%)</td>
+                            <td>6개 PNG + 2개 CSV</td>
+                        </tr>
+                        <tr>
+                            <td>라이프로그 통합</td>
+                            <td>46개 유의한 상관관계</td>
+                            <td>2개 PNG + 2개 CSV</td>
+                        </tr>
+                        <tr>
+                            <td>예측 모델</td>
+                            <td>Random Forest + Med-Gemma NN</td>
+                            <td>2개 CSV</td>
+                        </tr>
+                        <tr>
+                            <td><strong>총계</strong></td>
+                            <td><strong>6개 분석, 7개 모델</strong></td>
+                            <td><strong>48개 파일</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>🔬 Lifelog Pattern with Mental Health Questionnaire</h3>
+            <p style="margin-top: 15px; font-size: 1.1em;">
+                정신건강 설문 + 라이프로그 생체신호 통합 분석 프로젝트
+            </p>
+            <div class="footer-links">
+                <a href="https://github.com/bosoa/Lifelog_Pattern_with_MH_Questionaire" target="_blank">
+                    🔗 GitHub Repository
+                </a>
+                <span style="color: #95a5a6;">|</span>
+                <a href="mailto:bosoagalaxy@gmail.com">
+                    📧 Contact
+                </a>
+            </div>
+            <p style="margin-top: 30px; opacity: 0.8;">
+                분석 도구: Python, PyTorch, scikit-learn, pandas, seaborn<br>
+                생성일: 2026년 06월 28일<br>
+                © 2026 Mental Health Lifelog Analysis Project
+            </p>
+        </div>
+    </div>
+</body>
+</html>
