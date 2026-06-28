@@ -1,0 +1,6 @@
+Feature_Pair,R_Feature,Theta_Feature
+total_sleep + walk,r_total_sleep_walk,theta_total_sleep_walk
+stick_sensor + oxygen_saturation,r_stick_sensor_oxygen_saturation,theta_stick_sensor_oxygen_saturation
+heart_beat + hrv,r_heart_beat_hrv,theta_heart_beat_hrv
+rem_sleep + light_sleep,r_rem_sleep_light_sleep,theta_rem_sleep_light_sleep
+skin_temperature + blood_sugar,r_skin_temperature_blood_sugar,theta_skin_temperature_blood_sugar

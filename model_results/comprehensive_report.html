@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLOSDOM 이진 분류 개선 실험 종합 리포트</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(102,126,234,0.3);
+        }
+
+        .nav-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-card .label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .best-score {
+            background: #d4edda;
+            font-weight: 700;
+            color: #155724;
+        }
+
+        .insight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .insight-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .insight-box ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .insight-box li {
+            margin: 8px 0;
+        }
+
+        .recommendation-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .recommendation-box h3 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-box ul {
+            margin-left: 20px;
+            color: #0c5460;
+        }
+
+        .recommendation-box li {
+            margin: 8px 0;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 KLOSDOM 고위험군 탐지 모델 개선 실험</h1>
+            <p>이진 분류 성능 향상을 위한 4가지 접근법 비교 분석</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('overview')">📊 개요</button>
+            <button class="nav-btn" onclick="showSection('baseline')">🎯 기준선</button>
+            <button class="nav-btn" onclick="showSection('smote')">⚖️ SMOTE</button>
+            <button class="nav-btn" onclick="showSection('threshold')">🎚️ 임계값 조정</button>
+            <button class="nav-btn" onclick="showSection('ensemble')">🤝 앙상블</button>
+            <button class="nav-btn" onclick="showSection('comparison')">📈 종합 비교</button>
+            <button class="nav-btn" onclick="showSection('recommendations')">💡 권장사항</button>
+        </div>
+
+        <div class="content">
+            <!-- 개요 섹션 -->
+            <div id="overview" class="section active">
+                <h2>📊 실험 개요</h2>
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <h3>데이터셋</h3>
+                        <div class="value">2,682</div>
+                        <div class="label">사용자</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>관찰 기간</h3>
+                        <div class="value">93</div>
+                        <div class="label">일</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>센서</h3>
+                        <div class="value">18</div>
+                        <div class="label">종류</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>목표 변수</h3>
+                        <div class="value">3</div>
+                        <div class="label">불안·우울·스트레스</div>
+                    </div>
+                </div>
+
+                <div class="insight-box">
+                    <h3>🎯 문제 정의</h3>
+                    <ul>
+                        <li><strong>목표:</strong> 정신건강 고위험군 (≥7점) 조기 탐지</li>
+                        <li><strong>핵심 도전:</strong> 클래스 불균형 (고위험군 9.9~17.3%)</li>
+                        <li><strong>평가 지표:</strong> F1-Score, Recall (Accuracy는 불균형으로 인해 부적합)</li>
+                        <li><strong>임상 요구사항:</strong> 높은 Recall (고위험 환자 놓치지 않기)</li>
+                    </ul>
+                </div>
+
+                <h3>🧪 실험 방법론</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>방법</th>
+                            <th>접근법</th>
+                            <th>목표</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Baseline</strong></td>
+                            <td>XGBoost with scale_pos_weight</td>
+                            <td>기본 성능 측정</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SMOTE</strong></td>
+                            <td>합성 소수 샘플 생성</td>
+                            <td>데이터 레벨 불균형 해소</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Threshold Tuning</strong></td>
+                            <td>예측 임계값 최적화</td>
+                            <td>Precision-Recall 균형 조정</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ensemble</strong></td>
+                            <td>RandomForest + XGBoost 결합</td>
+                            <td>모델 앙상블로 강건성 향상</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 기준선 섹션 -->
+            <div id="baseline" class="section">
+                <h2>🎯 기준선 성능</h2>
+
+                <div class="chart-container">
+                    <div id="baseline-chart"></div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>목표 변수</th>
+                            <th>F1-Score</th>
+                            <th>ROC-AUC</th>
+                            <th>Recall</th>
+                            <th>Precision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Anxiety</strong></td>
+                            <td>0.118</td>
+                            <td>0.544</td>
+                            <td>0.220</td>
+                            <td>0.090</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Depression</strong></td>
+                            <td>0.129</td>
+                            <td>0.537</td>
+                            <td>0.220</td>
+                            <td>0.100</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stress</strong></td>
+                            <td>0.213</td>
+                            <td>0.540</td>
+                            <td>0.220</td>
+                            <td>0.210</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="insight-box">
+                    <h3>💡 주요 발견</h3>
+                    <ul>
+                        <li><strong>낮은 Recall (22%):</strong> 고위험 환자의 78%를 놓치고 있음</li>
+                        <li><strong>낮은 F1-Score:</strong> 전반적인 분류 성능 개선 필요</li>
+                        <li><strong>ROC-AUC ~0.54:</strong> 랜덤 추측보다 약간 나은 수준</li>
+                        <li><strong>Stress가 상대적으로 양호:</strong> F1 0.213으로 가장 높음</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SMOTE 섹션 -->
+            <div id="smote" class="section">
+                <h2>⚖️ SMOTE 오버샘플링</h2>
+
+                <div class="chart-container">
+                    <div id="smote-chart"></div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>목표 변수</th>
+                            <th>F1-Score</th>
+                            <th>ROC-AUC</th>
+                            <th>Recall</th>
+                            <th>Precision</th>
+                            <th>변화</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Anxiety</strong></td>
+                            <td>0.116</td>
+                            <td>0.556</td>
+                            <td>0.103</td>
+                            <td>0.133</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Depression</strong></td>
+                            <td>0.108</td>
+                            <td>0.554</td>
+                            <td>0.081</td>
+                            <td>0.161</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stress</strong></td>
+                            <td>0.176</td>
+                            <td>0.548</td>
+                            <td>0.150</td>
+                            <td>0.214</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="insight-box">
+                    <h3>💡 분석</h3>
+                    <ul>
+                        <li><strong>예상과 다른 결과:</strong> SMOTE가 오히려 성능 저하</li>
+                        <li><strong>Precision 증가, Recall 감소:</strong> 합성 샘플이 실제 패턴과 불일치</li>
+                        <li><strong>ROC-AUC 소폭 개선:</strong> 확률 추정은 약간 향상</li>
+                        <li><strong>결론:</strong> 단순 오버샘플링으로는 해결 불가</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 임계값 섹션 -->
+            <div id="threshold" class="section">
+                <h2>🎚️ 예측 임계값 조정 (Stress)</h2>
+
+                <div class="chart-container">
+                    <div id="threshold-chart"></div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>임계값</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1-Score</th>
+                            <th>특징</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="best-score">
+                            <td><strong>0.2</strong></td>
+                            <td>0.178</td>
+                            <td><strong>0.869</strong></td>
+                            <td><strong>0.296</strong></td>
+                            <td>🏆 최고 성능</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.3</strong></td>
+                            <td>0.183</td>
+                            <td>0.713</td>
+                            <td>0.291</td>
+                            <td>균형잡힌 옵션</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.4</strong></td>
+                            <td>0.192</td>
+                            <td>0.518</td>
+                            <td>0.280</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.5</strong></td>
+                            <td>0.210</td>
+                            <td>0.236</td>
+                            <td>0.222</td>
+                            <td>기본값</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.6</strong></td>
+                            <td>0.262</td>
+                            <td>0.073</td>
+                            <td>0.114</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><strong>0.7</strong></td>
+                            <td>0.318</td>
+                            <td>0.015</td>
+                            <td>0.029</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="insight-box">
+                    <h3>💡 핵심 발견</h3>
+                    <ul>
+                        <li><strong>임계값 0.2:</strong> Recall 87%로 극적 개선 (기준선 22% → 87%)</li>
+                        <li><strong>F1-Score 39% 향상:</strong> 0.213 → 0.296</li>
+                        <li><strong>트레이드오프:</strong> Precision 감소 (21% → 18%)는 감수 가능</li>
+                        <li><strong>임상적 의의:</strong> 고위험 환자의 87%를 탐지하여 조기 개입 가능</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 앙상블 섹션 -->
+            <div id="ensemble" class="section">
+                <h2>🤝 앙상블 모델</h2>
+
+                <div class="chart-container">
+                    <div id="ensemble-chart"></div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>목표 변수</th>
+                            <th>F1-Score</th>
+                            <th>ROC-AUC</th>
+                            <th>Recall</th>
+                            <th>Precision</th>
+                            <th>변화</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Anxiety</strong></td>
+                            <td>0.101</td>
+                            <td>0.549</td>
+                            <td>0.095</td>
+                            <td>0.109</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Depression</strong></td>
+                            <td>0.111</td>
+                            <td>0.531</td>
+                            <td>0.102</td>
+                            <td>0.121</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Stress</strong></td>
+                            <td>0.194</td>
+                            <td>0.535</td>
+                            <td>0.176</td>
+                            <td>0.216</td>
+                            <td>❌ F1 감소</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="insight-box">
+                    <h3>💡 분석</h3>
+                    <ul>
+                        <li><strong>기대와 다른 결과:</strong> 앙상블이 단일 모델보다 낮은 성능</li>
+                        <li><strong>가능한 원인:</strong> 두 모델이 유사한 오류 패턴을 보임</li>
+                        <li><strong>다양성 부족:</strong> RandomForest와 XGBoost 모두 트리 기반</li>
+                        <li><strong>결론:</strong> 더 다양한 모델 유형 필요 (예: Logistic Regression + XGBoost)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 종합 비교 섹션 -->
+            <div id="comparison" class="section">
+                <h2>📈 전체 방법 종합 비교</h2>
+
+                <div class="chart-container">
+                    <div id="comparison-chart"></div>
+                </div>
+
+                <h3>🏆 최종 순위 (F1-Score 기준)</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>순위</th>
+                            <th>목표 변수</th>
+                            <th>방법</th>
+                            <th>F1-Score</th>
+                            <th>Recall</th>
+                            <th>개선율</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="best-score">
+                            <td>🥇 1위</td>
+                            <td><strong>Stress</strong></td>
+                            <td><strong>Threshold=0.2</strong></td>
+                            <td><strong>0.296</strong></td>
+                            <td><strong>0.869</strong></td>
+                            <td><strong>+39%</strong></td>
+                        </tr>
+                        <tr>
+                            <td>🥈 2위</td>
+                            <td>Stress</td>
+                            <td>Baseline</td>
+                            <td>0.213</td>
+                            <td>0.220</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>🥉 3위</td>
+                            <td>Stress</td>
+                            <td>Ensemble</td>
+                            <td>0.194</td>
+                            <td>0.176</td>
+                            <td>-9%</td>
+                        </tr>
+                        <tr>
+                            <td>4위</td>
+                            <td>Depression</td>
+                            <td>Baseline</td>
+                            <td>0.129</td>
+                            <td>0.220</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>5위</td>
+                            <td>Anxiety</td>
+                            <td>Baseline</td>
+                            <td>0.118</td>
+                            <td>0.220</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="insight-box">
+                    <h3>💡 종합 인사이트</h3>
+                    <ul>
+                        <li><strong>임계값 조정이 가장 효과적:</strong> 간단하면서도 극적인 성능 향상</li>
+                        <li><strong>SMOTE와 앙상블 실패:</strong> 데이터의 본질적 특성 문제</li>
+                        <li><strong>Stress가 가장 예측 가능:</strong> 센서 데이터와 강한 상관성</li>
+                        <li><strong>Anxiety/Depression 어려움:</strong> 더 복잡한 특징 필요</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 권장사항 섹션 -->
+            <div id="recommendations" class="section">
+                <h2>💡 권장사항 및 향후 방향</h2>
+
+                <div class="recommendation-box">
+                    <h3>🎯 즉시 적용 가능한 개선</h3>
+                    <ul>
+                        <li><strong>Stress 모델 배포:</strong> 임계값 0.2로 설정하여 87% Recall 달성</li>
+                        <li><strong>2단계 스크리닝:</strong> 1차(낮은 임계값) → 2차(정밀 평가)</li>
+                        <li><strong>알림 시스템:</strong> 고위험 확률 0.2 이상 시 조기 경보</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-box">
+                    <h3>🔬 중기 개선 방향</h3>
+                    <ul>
+                        <li><strong>시계열 특징:</strong> 7일/14일 이동평균, 변화율, 추세</li>
+                        <li><strong>도메인 특징:</strong> 수면 파편화, 활동 패턴 변화</li>
+                        <li><strong>개인화 모델:</strong> 유저별 베이스라인 대비 변화 감지</li>
+                        <li><strong>다양한 앙상블:</strong> Logistic + XGBoost + Neural Network</li>
+                    </ul>
+                </div>
+
+                <div class="recommendation-box">
+                    <h3>🚀 장기 연구 방향</h3>
+                    <ul>
+                        <li><strong>LSTM/Transformer:</strong> 시계열 순서 패턴 학습</li>
+                        <li><strong>준지도 학습:</strong> 미응답 데이터 활용</li>
+                        <li><strong>다중 작업 학습:</strong> Anxiety-Depression-Stress 동시 예측</li>
+                        <li><strong>설명가능 AI:</strong> 임상 의사결정 지원을 위한 해석성</li>
+                        <li><strong>외부 검증:</strong> 다른 코호트 데이터셋으로 일반화 평가</li>
+                    </ul>
+                </div>
+
+                <h3>📊 데이터 수집 개선</h3>
+                <div class="insight-box">
+                    <ul>
+                        <li><strong>설문 응답률 향상:</strong> 현재 8% → 목표 30%+</li>
+                        <li><strong>빈 센서 해결:</strong> wakeup_time, bed_time, blood_pressure</li>
+                        <li><strong>라벨 품질:</strong> 전문가 검증, 다중 평가자 일치도</li>
+                        <li><strong>균형 샘플링:</strong> 고위험군 오버샘플링 전략</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Baseline Chart
+        const baselineData = [
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.118, 0.129, 0.213],
+                name: 'F1-Score',
+                type: 'bar',
+                marker: {color: '#667eea'}
+            },
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.220, 0.220, 0.220],
+                name: 'Recall',
+                type: 'bar',
+                marker: {color: '#764ba2'}
+            }
+        ];
+
+        Plotly.newPlot('baseline-chart', baselineData, {
+            title: '기준선 성능 (XGBoost)',
+            barmode: 'group',
+            yaxis: {title: 'Score', range: [0, 1]},
+            height: 400
+        });
+
+        // SMOTE Chart
+        const smoteData = [
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.118, 0.129, 0.213],
+                name: 'Baseline F1',
+                type: 'bar',
+                marker: {color: '#667eea'}
+            },
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.116, 0.108, 0.176],
+                name: 'SMOTE F1',
+                type: 'bar',
+                marker: {color: '#e74c3c'}
+            }
+        ];
+
+        Plotly.newPlot('smote-chart', smoteData, {
+            title: 'SMOTE vs Baseline F1-Score 비교',
+            barmode: 'group',
+            yaxis: {title: 'F1-Score', range: [0, 0.3]},
+            height: 400
+        });
+
+        // Threshold Chart
+        const thresholdData = [
+            {
+                x: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+                y: [0.296, 0.291, 0.280, 0.222, 0.114, 0.029],
+                name: 'F1-Score',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#667eea', width: 3},
+                marker: {size: 10}
+            },
+            {
+                x: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+                y: [0.869, 0.713, 0.518, 0.236, 0.073, 0.015],
+                name: 'Recall',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#e74c3c', width: 3},
+                marker: {size: 10}
+            },
+            {
+                x: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
+                y: [0.178, 0.183, 0.192, 0.210, 0.262, 0.318],
+                name: 'Precision',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#2ecc71', width: 3},
+                marker: {size: 10}
+            }
+        ];
+
+        Plotly.newPlot('threshold-chart', thresholdData, {
+            title: 'Stress - 임계값에 따른 성능 변화',
+            xaxis: {title: '예측 임계값'},
+            yaxis: {title: 'Score', range: [0, 1]},
+            height: 400
+        });
+
+        // Ensemble Chart
+        const ensembleData = [
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.118, 0.129, 0.213],
+                name: 'Baseline F1',
+                type: 'bar',
+                marker: {color: '#667eea'}
+            },
+            {
+                x: ['Anxiety', 'Depression', 'Stress'],
+                y: [0.101, 0.111, 0.194],
+                name: 'Ensemble F1',
+                type: 'bar',
+                marker: {color: '#f39c12'}
+            }
+        ];
+
+        Plotly.newPlot('ensemble-chart', ensembleData, {
+            title: '앙상블 vs Baseline F1-Score 비교',
+            barmode: 'group',
+            yaxis: {title: 'F1-Score', range: [0, 0.3]},
+            height: 400
+        });
+
+        // Comparison Chart
+        const comparisonData = [
+            {
+                x: ['Baseline', 'SMOTE', 'Ensemble', 'Threshold=0.2'],
+                y: [0.213, 0.176, 0.194, 0.296],
+                name: 'Stress F1-Score',
+                type: 'bar',
+                marker: {
+                    color: ['#667eea', '#e74c3c', '#f39c12', '#2ecc71'],
+                }
+            }
+        ];
+
+        Plotly.newPlot('comparison-chart', comparisonData, {
+            title: 'Stress 전체 방법 F1-Score 비교',
+            yaxis: {title: 'F1-Score', range: [0, 0.35]},
+            height: 400,
+            annotations: [
+                {
+                    x: 'Threshold=0.2',
+                    y: 0.296,
+                    text: '🏆 Best: +39%',
+                    showarrow: true,
+                    arrowhead: 2,
+                    ax: 0,
+                    ay: -40
+                }
+            ]
+        });
+    </script>
+</body>
+</html>

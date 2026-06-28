@@ -1,0 +1,51 @@
+# R workspace / history
+.RData
+.RDataTmp*
+.Rhistory
+
+# RStudio project user settings
+.Rproj.user/
+
+# Original research data (sensitive participant data)
+data_org/
+data/
+
+# Preprocessing output (generated files)
+output/
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# Streamlit cache
+.streamlit/

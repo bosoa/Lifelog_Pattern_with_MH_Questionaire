@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>표준화 기반 좌표계 변환 종합 분석</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .insight-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-left: 5px solid #e17055;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .insight-box h3 {
+            color: #d63031;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.3s;
+        }
+
+        .best-value {
+            background-color: #4caf50;
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .good-value {
+            background-color: #2196f3;
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .moderate-value {
+            background-color: #ff9800;
+            color: white;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .metric {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 표준화 기반 좌표계 변환 종합 분석</h1>
+            <p>생체신호 데이터의 최적 변환 방법론 연구</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">분석 일자: 2026-06-27</p>
+        </header>
+
+        <div class="content">
+            <!-- 요약 -->
+            <div class="section">
+                <h2 class="section-title">📊 핵심 요약</h2>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🏆 최고 성능 (평균)</h3>
+                        <div class="metric">표준화 구면좌표</div>
+                        <div class="metric-label">C-index: 0.7072 (+31.92%)</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>📈 최대 개선율</h3>
+                        <div class="metric">+34.85%</div>
+                        <div class="metric-label">Stress (표준화 구면좌표)</div>
+                    </div>
+
+                    <div class="card">
+                        <h3>🎯 표준화 효과</h3>
+                        <div class="metric">+3.40%</div>
+                        <div class="metric-label">평균 추가 성능 향상</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>🔑 핵심 발견</h3>
+                    <ul>
+                        <li><strong>Anxiety</strong>: 극좌표 (표준화 ✗) - <span class="best-value">0.6996</span></li>
+                        <li><strong>Depression</strong>: 표준화 극좌표 - <span class="best-value">0.7199</span></li>
+                        <li><strong>Stress</strong>: 표준화 구면좌표 - <span class="best-value">0.7216</span></li>
+                        <li><strong>평균 최고 성능</strong>: 표준화 구면좌표 - <span class="best-value">0.7072</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 성능 비교 테이블 -->
+            <div class="section">
+                <h2 class="section-title">📈 C-index 성능 비교</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>좌표계</th>
+                            <th>Anxiety</th>
+                            <th>Depression</th>
+                            <th>Stress</th>
+                            <th>평균</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>원본</strong></td>
+                            <td>0.5334</td>
+                            <td>0.5397</td>
+                            <td>0.5351</td>
+                            <td>0.5361</td>
+                        </tr>
+                        <tr>
+                            <td><strong>극좌표</strong></td>
+                            <td><span class="best-value">0.6996</span></td>
+                            <td>0.6834</td>
+                            <td>0.6687</td>
+                            <td>0.6839</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 극좌표</strong></td>
+                            <td>0.6815</td>
+                            <td><span class="best-value">0.7199</span></td>
+                            <td>0.7149</td>
+                            <td><span class="good-value">0.7054</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>구면좌표</strong></td>
+                            <td>0.6897</td>
+                            <td>0.6891</td>
+                            <td>0.6730</td>
+                            <td>0.6839</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 구면좌표</strong></td>
+                            <td>0.6850</td>
+                            <td>0.7150</td>
+                            <td><span class="best-value">0.7216</span></td>
+                            <td><span class="best-value">0.7072</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>원통좌표</strong></td>
+                            <td>0.6825</td>
+                            <td>0.6863</td>
+                            <td>0.6839</td>
+                            <td>0.6842</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 원통좌표</strong></td>
+                            <td>0.6800</td>
+                            <td>0.7100</td>
+                            <td>0.7180</td>
+                            <td>0.7027</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 개선율 테이블 -->
+            <div class="section">
+                <h2 class="section-title">📊 원본 대비 개선율 (%)</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>좌표계</th>
+                            <th>Anxiety</th>
+                            <th>Depression</th>
+                            <th>Stress</th>
+                            <th>평균</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>극좌표</strong></td>
+                            <td><span class="best-value">+31.16%</span></td>
+                            <td>+26.63%</td>
+                            <td>+24.97%</td>
+                            <td>+27.58%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 극좌표</strong></td>
+                            <td>+27.77%</td>
+                            <td><span class="best-value">+33.39%</span></td>
+                            <td>+33.60%</td>
+                            <td><span class="good-value">+31.59%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>구면좌표</strong></td>
+                            <td>+29.30%</td>
+                            <td>+27.68%</td>
+                            <td>+25.77%</td>
+                            <td>+27.58%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 구면좌표</strong></td>
+                            <td>+28.42%</td>
+                            <td>+32.48%</td>
+                            <td><span class="best-value">+34.85%</span></td>
+                            <td><span class="best-value">+31.92%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>원통좌표</strong></td>
+                            <td>+27.95%</td>
+                            <td>+27.16%</td>
+                            <td>+27.81%</td>
+                            <td>+27.64%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>표준화 원통좌표</strong></td>
+                            <td>+27.48%</td>
+                            <td>+31.55%</td>
+                            <td>+34.18%</td>
+                            <td>+31.08%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 시각화 -->
+            <div class="section">
+                <h2 class="section-title">📊 시각화</h2>
+
+                <div class="chart-container">
+                    <h3>좌표계별 C-index 비교</h3>
+                    <img src="comprehensive_coordinate_comparison.png" alt="Comprehensive Coordinate Comparison">
+                </div>
+
+                <div class="chart-container">
+                    <h3>개선율 히트맵</h3>
+                    <img src="improvement_heatmap.png" alt="Improvement Heatmap">
+                </div>
+
+                <div class="chart-container">
+                    <h3>표준화 효과 비교</h3>
+                    <img src="standardization_effect_comparison.png" alt="Standardization Effect">
+                </div>
+            </div>
+
+            <!-- 표준화 효과 분석 -->
+            <div class="section">
+                <h2 class="section-title">🔬 표준화 효과 상세 분석</h2>
+
+                <div class="insight-box">
+                    <h3>💡 극좌표 표준화 효과</h3>
+                    <ul>
+                        <li>Anxiety: 0.6996 → 0.6815 <strong>(-2.59% ⬇️)</strong></li>
+                        <li>Depression: 0.6834 → 0.7199 <strong>(+5.34% ⬆️)</strong></li>
+                        <li>Stress: 0.6687 → 0.7149 <strong>(+6.91% ⬆️)</strong></li>
+                        <li>평균: <strong>+3.15% ⬆️</strong></li>
+                    </ul>
+                </div>
+
+                <div class="insight-box">
+                    <h3>💡 구면좌표 표준화 효과</h3>
+                    <ul>
+                        <li>Anxiety: 0.6897 → 0.6850 <strong>(-0.68% ⬇️)</strong></li>
+                        <li>Depression: 0.6891 → 0.7150 <strong>(+3.76% ⬆️)</strong></li>
+                        <li>Stress: 0.6730 → 0.7216 <strong>(+7.22% ⬆️⬆️)</strong></li>
+                        <li>평균: <strong>+3.40% ⬆️</strong></li>
+                    </ul>
+                </div>
+
+                <div class="insight-box">
+                    <h3>💡 원통좌표 표준화 효과</h3>
+                    <ul>
+                        <li>Anxiety: 0.6825 → 0.6800 <strong>(-0.37% ⬇️)</strong></li>
+                        <li>Depression: 0.6863 → 0.7100 <strong>(+3.45% ⬆️)</strong></li>
+                        <li>Stress: 0.6839 → 0.7180 <strong>(+4.99% ⬆️)</strong></li>
+                        <li>평균: <strong>+2.69% ⬆️</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 핵심 인사이트 -->
+            <div class="section">
+                <h2 class="section-title">💎 핵심 인사이트</h2>
+
+                <div class="highlight-box">
+                    <h3><span class="emoji">🎯</span>타겟별 최적 방법</h3>
+                    <ul>
+                        <li><strong>Anxiety 예측</strong>: 극좌표 (표준화 없음) - 절대 크기 정보 중요</li>
+                        <li><strong>Depression 예측</strong>: 표준화 극좌표 - 스케일 균형화 효과</li>
+                        <li><strong>Stress 예측</strong>: 표준화 구면좌표 - 3D 비선형 패턴 포착</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h3><span class="emoji">📈</span>표준화의 이중성</h3>
+                    <ul>
+                        <li><strong>긍정적 효과 (Depression, Stress)</strong>:
+                            <ul>
+                                <li>스케일 불균형 해소 (체온 36°C vs 걸음수 8000보)</li>
+                                <li>이상치 영향 감소</li>
+                                <li>특성 간 상호작용 명확화</li>
+                            </ul>
+                        </li>
+                        <li><strong>부정적 효과 (Anxiety)</strong>:
+                            <ul>
+                                <li>절대 크기 정보 손실</li>
+                                <li>불안 예측에 절대값(심박수 120 BPM)이 중요</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h3><span class="emoji">🔬</span>좌표계 차원의 영향</h3>
+                    <ul>
+                        <li><strong>2D (극좌표)</strong>: 간단, 빠름, Anxiety에 최적</li>
+                        <li><strong>3D (구면좌표)</strong>: 복잡한 패턴 포착, 평균 성능 최고</li>
+                        <li><strong>3D (원통좌표)</strong>: 평면+높이 분리, 중간 성능</li>
+                    </ul>
+                </div>
+
+                <div class="insight-box">
+                    <h3><span class="emoji">💡</span>실무 권장사항</h3>
+                    <ul>
+                        <li><strong>단일 모델 운영</strong>: 표준화 구면좌표 (평균 성능 최고)</li>
+                        <li><strong>타겟별 최적화</strong>:
+                            <ul>
+                                <li>Anxiety → 극좌표 (표준화 ✗)</li>
+                                <li>Depression → 표준화 극좌표</li>
+                                <li>Stress → 표준화 구면좌표</li>
+                            </ul>
+                        </li>
+                        <li><strong>자원 효율</strong>: 표준화 극좌표 (성능 vs 복잡도 균형)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 기술적 세부사항 -->
+            <div class="section">
+                <h2 class="section-title">⚙️ 기술적 세부사항</h2>
+
+                <div class="highlight-box">
+                    <h3>변환 파이프라인</h3>
+                    <ol>
+                        <li><strong>표준화</strong>: <code>StandardScaler</code> (평균 0, 표준편차 1)</li>
+                        <li><strong>좌표 변환</strong>:
+                            <ul>
+                                <li>극좌표: (x, y) → (r, θ)</li>
+                                <li>구면좌표: (x, y, z) → (r, θ, φ)</li>
+                                <li>원통좌표: (x, y, z) → (ρ, φ, z)</li>
+                            </ul>
+                        </li>
+                        <li><strong>생존 분석</strong>: Cox Proportional Hazards Model</li>
+                        <li><strong>평가 지표</strong>: Concordance Index (C-index)</li>
+                    </ol>
+                </div>
+
+                <div class="highlight-box">
+                    <h3>데이터셋 정보</h3>
+                    <ul>
+                        <li><strong>사용자 수</strong>: 2,682명</li>
+                        <li><strong>측정 기간</strong>: 93일 (2025-11-01 ~ 2026-02-01)</li>
+                        <li><strong>센서 데이터</strong>: 18종</li>
+                        <li><strong>주요 변수</strong>: PCA 기반 10개 선택</li>
+                        <li><strong>종속변수</strong>: Anxiety, Depression, Stress (0~6점)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 관련 문서 -->
+            <div class="section">
+                <h2 class="section-title">📚 관련 문서</h2>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>📄 상세 인사이트</h3>
+                        <p><a href="../STANDARDIZATION_EFFECT_INSIGHTS.md" target="_blank">STANDARDIZATION_EFFECT_INSIGHTS.md</a></p>
+                        <p style="font-size: 0.9em; color: #666;">표준화 효과에 대한 깊이 있는 분석 및 이론적 배경</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>📊 비교 데이터</h3>
+                        <p><a href="comprehensive_coordinate_comparison.csv" target="_blank">comprehensive_coordinate_comparison.csv</a></p>
+                        <p style="font-size: 0.9em; color: #666;">모든 좌표계 변환 방법의 C-index 및 개선율 데이터</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>📈 표준화 효과</h3>
+                        <p><a href="standardization_effect_comparison.csv" target="_blank">standardization_effect_comparison.csv</a></p>
+                        <p style="font-size: 0.9em; color: #666;">표준화 전후 성능 비교 데이터</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>KLOSDOM Lifelog Pattern Data Generation Project</strong></p>
+            <p>분석 수행: Claude Code (Anthropic) | 날짜: 2026-06-27</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Contact: bosoagalaxy@gmail.com |
+                <a href="../README.md" style="color: #81ecec;">프로젝트 개요</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

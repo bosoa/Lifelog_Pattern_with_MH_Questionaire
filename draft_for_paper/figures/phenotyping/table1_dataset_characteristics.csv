@@ -1,0 +1,34 @@
+﻿특성 (Characteristics),값
+전체 샘플 수 (명),"281,138"
+,
+타겟별 분포,
+  - Anxiety,
+    • Train,"176,160 (62.7%)"
+    • Validation,"50,332 (17.9%)"
+    • Test,"25,166 (8.9%)"
+    • 이벤트 비율 (%),6.6
+,
+  - Depression,
+    • Train,"10,358 (3.7%)"
+    • Validation,"2,960 (1.1%)"
+    • Test,"1,480 (0.5%)"
+    • 이벤트 비율 (%),47.4
+,
+  - Stress,
+    • Train,"10,276 (3.7%)"
+    • Validation,"2,937 (1.0%)"
+    • Test,"1,469 (0.5%)"
+    • 이벤트 비율 (%),24.6
+,
+특징 변수,
+  - 수면 지표 (개),"3 (total_sleep, rem_sleep, light_sleep)"
+  - 심혈관 지표 (개),"2 (heart_beat, hrv)"
+  - 활동 지표 (개),"2 (walk, stick_sensor)"
+  - 대사 지표 (개),"2 (blood_sugar, body_temperature)"
+  - 기타 (개),"1 (skin_temperature, oxygen_saturation)"
+  - 총 특징 변수 (개),10
+,
+데이터 전처리,
+  - 결측치 처리,중앙값 대체 (Median imputation)
+  - 이상치 처리,"IQR 기반 클리핑 (Q1-1.5×IQR, Q3+1.5×IQR)"
+  - 표준화 방법,"StandardScaler (μ=0, σ=1)"

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLOSDOM 정신건강 예측 분석 통합 대시보드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* 헤더 */
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            opacity: 0.95;
+            font-size: 1.05em;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            background: white;
+            display: flex;
+            gap: 5px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            background: #e8e8e8;
+            color: #333;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #764ba2;
+        }
+
+        .tab-icon {
+            margin-right: 8px;
+        }
+
+        /* 콘텐츠 영역 */
+        .content-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* 홈 화면 */
+        .home-content {
+            padding: 50px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .welcome-section p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-card li {
+            padding: 8px 0;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .info-card li::before {
+            content: '✓ ';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .stats-banner {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-item .label {
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 5px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .tab-button {
+                padding: 10px 16px;
+                font-size: 0.85em;
+            }
+
+            .welcome-section {
+                padding: 40px 30px;
+            }
+
+            .welcome-section h2 {
+                font-size: 1.8em;
+            }
+
+            .home-content {
+                padding: 30px 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 로딩 인디케이터 */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>🧠 KLOSDOM 정신건강 예측 분석 통합 대시보드</h1>
+            <p>Korea Lifelog Observatory for Sustainable Dementia Outcome Management</p>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('home')">
+                <span class="tab-icon">🏠</span>홈
+            </button>
+            <button class="tab-button" onclick="switchTab('data-distribution')">
+                <span class="tab-icon">📊</span>데이터 분포
+            </button>
+            <button class="tab-button" onclick="switchTab('anxiety-model')">
+                <span class="tab-icon">😰</span>Anxiety 모델
+            </button>
+            <button class="tab-button" onclick="switchTab('depression-model')">
+                <span class="tab-icon">😔</span>Depression 모델
+            </button>
+            <button class="tab-button" onclick="switchTab('stress-model')">
+                <span class="tab-icon">😫</span>Stress 모델
+            </button>
+            <button class="tab-button" onclick="switchTab('anxiety-survival')">
+                <span class="tab-icon">🏥</span>Anxiety 생존분석
+            </button>
+            <button class="tab-button" onclick="switchTab('depression-survival')">
+                <span class="tab-icon">🏥</span>Depression 생존분석
+            </button>
+            <button class="tab-button" onclick="switchTab('stress-survival')">
+                <span class="tab-icon">🏥</span>Stress 생존분석
+            </button>
+            <button class="tab-button" onclick="switchTab('anxiety-survival-filtered')">
+                <span class="tab-icon">🎯</span>Anxiety 생존(필터)
+            </button>
+            <button class="tab-button" onclick="switchTab('depression-survival-filtered')">
+                <span class="tab-icon">🎯</span>Depression 생존(필터)
+            </button>
+            <button class="tab-button" onclick="switchTab('stress-survival-filtered')">
+                <span class="tab-icon">🎯</span>Stress 생존(필터)
+            </button>
+        </div>
+
+        <!-- 콘텐츠 영역 -->
+        <div class="content-container">
+            <!-- 홈 -->
+            <div id="home" class="tab-content active">
+                <div class="home-content">
+                    <div class="welcome-section">
+                        <h2>환영합니다! 👋</h2>
+                        <p>KLOSDOM 프로젝트의 정신건강 예측 분석 결과를 확인하실 수 있습니다.</p>
+                        <p>위 탭을 클릭하여 원하는 분석 결과를 확인하세요.</p>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="info-card">
+                            <h3>📊 데이터 분포 분석</h3>
+                            <ul>
+                                <li>종속변수별 분포 시각화</li>
+                                <li>히스토그램, 박스플롯, 바이올린 플롯</li>
+                                <li>계층별 비교 분석</li>
+                                <li>종속변수 간 상관관계</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>🤖 모델 비교 분석</h3>
+                            <ul>
+                                <li>RandomForest vs XGBoost</li>
+                                <li>성능 지표 비교 (R², MAE)</li>
+                                <li>계층화 데이터 시각화</li>
+                                <li>특징 중요도 분석</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>🏥 생존 분석 (Cox PH)</h3>
+                            <ul>
+                                <li>Kaplan-Meier 생존 곡선</li>
+                                <li>Hazard Ratios 분석</li>
+                                <li>Calibration Plot</li>
+                                <li>Nomogram 예측 도구</li>
+                                <li>우도비 검정 (p-value)</li>
+                            </ul>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>📈 주요 분석 결과</h3>
+                            <ul>
+                                <li>총 14,682-14,798개 샘플</li>
+                                <li>10개 주요 센서 변수</li>
+                                <li>3개 종속변수 (Anxiety, Depression, Stress)</li>
+                                <li>계층별 패턴 분석 (3 levels)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="stats-banner">
+                        <div class="stat-item">
+                            <span class="number">~14,700</span>
+                            <span class="label">총 샘플 수</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">10</span>
+                            <span class="label">주요 변수</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">3</span>
+                            <span class="label">종속변수</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">0.67-0.70</span>
+                            <span class="label">C-index 범위</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number">< 10⁻¹⁷⁷</span>
+                            <span class="label">LR Test p-value</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 데이터 분포 -->
+            <div id="data-distribution" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="data_distribution_report.html"></iframe>
+            </div>
+
+            <!-- Anxiety 모델 -->
+            <div id="anxiety-model" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="anxiety_model_comparison_report.html"></iframe>
+            </div>
+
+            <!-- Depression 모델 -->
+            <div id="depression-model" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="depression_model_comparison_report.html"></iframe>
+            </div>
+
+            <!-- Stress 모델 -->
+            <div id="stress-model" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="stress_model_comparison_report.html"></iframe>
+            </div>
+
+            <!-- Anxiety 생존분석 -->
+            <div id="anxiety-survival" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="anxiety_survival_analysis_report.html"></iframe>
+            </div>
+
+            <!-- Depression 생존분석 -->
+            <div id="depression-survival" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="depression_survival_analysis_report.html"></iframe>
+            </div>
+
+            <!-- Stress 생존분석 -->
+            <div id="stress-survival" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="stress_survival_analysis_report.html"></iframe>
+            </div>
+
+            <!-- Anxiety 생존분석 (필터링) -->
+            <div id="anxiety-survival-filtered" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="anxiety_survival_analysis_filtered_report.html"></iframe>
+            </div>
+
+            <!-- Depression 생존분석 (필터링) -->
+            <div id="depression-survival-filtered" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="depression_survival_analysis_filtered_report.html"></iframe>
+            </div>
+
+            <!-- Stress 생존분석 (필터링) -->
+            <div id="stress-survival-filtered" class="tab-content">
+                <div class="loading active">
+                    <div class="spinner"></div>
+                    <p>리포트를 불러오는 중...</p>
+                </div>
+                <iframe src="stress_survival_analysis_filtered_report.html"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // 모든 탭 버튼과 콘텐츠 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // 선택된 탭 활성화
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // iframe 로딩 처리
+            const activeContent = document.getElementById(tabName);
+            const iframe = activeContent.querySelector('iframe');
+            const loading = activeContent.querySelector('.loading');
+
+            if (iframe && loading) {
+                iframe.onload = function() {
+                    loading.classList.remove('active');
+                };
+            }
+        }
+
+        // 초기 로딩 시 iframe 로드 처리
+        window.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('iframe').forEach(iframe => {
+                const parent = iframe.parentElement;
+                const loading = parent.querySelector('.loading');
+
+                if (loading) {
+                    iframe.onload = function() {
+                        loading.classList.remove('active');
+                    };
+                }
+            });
+        });
+    </script>
+</body>
+</html>
